@@ -1,0 +1,71 @@
+{
+  "name": "yoga",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.10.5",
+    "@mantine/carousel": "^5.8.0",
+    "@mantine/core": "^5.8.0",
+    "@mantine/dates": "^5.8.0",
+    "@mantine/dropzone": "^5.8.0",
+    "@mantine/ds": "^5.8.0",
+    "@mantine/form": "^5.8.0",
+    "@mantine/hooks": "^5.8.0",
+    "@mantine/modals": "^5.8.0",
+    "@mantine/notifications": "^5.8.0",
+    "@mantine/nprogress": "^5.8.0",
+    "@mantine/prism": "^5.8.0",
+    "@mantine/spotlight": "^5.8.0",
+    "@mantine/tiptap": "^5.8.0",
+    "@tabler/icons": "^1.111.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@tiptap/extension-link": "^2.0.0-beta.202",
+    "@tiptap/react": "^2.0.0-beta.202",
+    "@tiptap/starter-kit": "^2.0.0-beta.202",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.3",
+    "@types/react": "^18.0.25",
+    "@types/react-dom": "^18.0.9",
+    "dayjs": "^1.11.6",
+    "embla-carousel-react": "^7.0.5",
+    "jwt-decode": "^3.1.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-player": "^2.11.0",
+    "react-redux": "^8.0.5",
+    "react-router": "^6.4.3",
+    "react-router-dom": "^6.4.3",
+    "react-scripts": "5.0.1",
+    "redux": "^4.2.0",
+    "typescript": "^4.9.3",
+    "video-react": "^0.16.0",
+    "web-vitals": "^2.1.4",
+    "youtube-thumbnail-grabber": "^1.0.2"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
