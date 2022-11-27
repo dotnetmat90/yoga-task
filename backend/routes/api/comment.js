@@ -13,13 +13,13 @@ router.get("/:id", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
-  const comment = await Comment.findByIdAndUpdate(req.params.id ,{$set:req.body},{new:true});
+  const comment = await Comment.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
   return res.send(comment);
 });
 
 router.get("/", async (req, res) => {
   try {
-    let comments = await Comment.find();
+    let comments = await Comment.find().sort({_id: 'desc'});
     if (comments.length > 0) {
       res.status(200).send(comments);
     } else {
@@ -31,9 +31,9 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-    const comment = new Comment(req.body);
-    await comment.save();
-    return res.send(comment);
+  const comment = new Comment(req.body);
+  await comment.save();
+  return res.send(comment);
 });
 
 module.exports = router;

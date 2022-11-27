@@ -101,9 +101,9 @@ export function BadgeCard({ id, image, video, title, description, country, badge
         <Button radius="md" style={{ flex: 1 }} onClick={(e:any) => navigate('/courses/' + id)}>
           Watch
         </Button>
-        {/* <ActionIcon variant="default" radius="md" size={36}>
-          <IconHeart size={18} className={classes.like} stroke={1.5} />
-        </ActionIcon> */}
+        <ActionIcon variant="default" radius="md" size={36}>
+          <IconHeart size={18} className={classes.like} fill={"red"}  stroke={1.5} />
+        </ActionIcon>
       </Group>
     </Card>
   );

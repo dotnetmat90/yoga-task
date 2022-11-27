@@ -1,12 +1,17 @@
-import { createStyles, Container, Group, ActionIcon, Footer, Title, SimpleGrid, Input, Grid, CloseButton, AspectRatio, Textarea, Button, Switch } from '@mantine/core';
+import { createStyles, Container, Text, ScrollArea, Code, Group, ActionIcon, Footer, Title, SimpleGrid, Input, Grid, CloseButton, Textarea, Button, Switch } from '@mantine/core';
 import { IconBrandTwitter, IconBrandYoutube, IconBrandInstagram, IconSearch } from '@tabler/icons';
 import { useNavigate } from 'react-router-dom';
 import jwt_decode from "jwt-decode";
-import React from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import BadgeCard from './BadgeCard';
 import CommentSimple from './CommentSimple';
 import { showNotification } from '@mantine/notifications';
+import Plyr from "plyr-react"
+import "plyr-react/plyr.css"
+import { type } from 'os';
+import Video from './Video';
+import { AspectRatio } from '@mantine/core';
 
 const useStyles = createStyles((theme) => ({
     footer: {
@@ -38,6 +43,7 @@ export interface CourseData {
     name: string,
     videoUrl: string;
     _id: string,
+    createdBy: string;
 }
 
 export interface UserData {
@@ -81,8 +87,8 @@ export function Course() {
     const addComment = () => {
 
 
-        const test = jwt_decode(localStorage.getItem("accessToken") as string) as UserData;
- 
+        const currentUser = jwt_decode(localStorage.getItem("accessToken") as string) as UserData;
+
         if (!comment) {
             showNotification({
                 title: 'Comment cannot be empty!',
@@ -96,12 +102,16 @@ export function Course() {
             text: comment,
             courseId: course._id,
             userId: user._id,
-            userName: test.firstname + " " + test.lastname,
+            userName: currentUser.firstname + " " + currentUser.lastname,
             date: new Date()
         }
 
+        if (currentUser.type == 'creator' && currentUser._id == course.createdBy) {
+            commentData.userName += " (Trainer)";
+        }
 
-        console.log(test.firstname);
+
+        console.log(currentUser.firstname);
         axios
             .post(`http://localhost:4000/api/comments`, commentData)
             .then((response) => {
@@ -135,7 +145,7 @@ export function Course() {
 
     }
 
-    const getCourses = () => {
+    const getCourse = () => {
 
         const id = window.location.pathname.replace('/courses/', '');
         axios
@@ -152,8 +162,11 @@ export function Course() {
             });
     };
 
-    React.useEffect(getCourses, []);
+    React.useEffect(getCourse, []);
     React.useEffect(getComments, []);
+    const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
+
+
 
     return (
 
@@ -162,6 +175,7 @@ export function Course() {
                 <Grid gutter="md">
                     <Grid.Col>
                         <h1>{course.name}</h1>
+
 
                         <AspectRatio ratio={16 / 9}>
                             {course.link ? (<>
@@ -173,13 +187,10 @@ export function Course() {
                                     allowFullScreen
                                 />
                             </>) : (<>
-                                <>
-                                    <div className="App">
-                                        <video controls={true}    autoPlay={false} height={450}>
-                                            <source src={course.videoUrl} type="video/mp4" />
-                                        </video>
-                                    </div>
-                                </>
+
+
+                                <Video url={course.videoUrl} key={course.videoUrl}  >{course.videoUrl}</Video>
+
                             </>)
                             }
                         </AspectRatio>
@@ -205,14 +216,44 @@ export function Course() {
                         </SimpleGrid>
                     </Grid.Col>
                     <Grid.Col>
-                        {comments.length > 0 ? (<> <h4>Latest:</h4></>) : (<><p></p></>)}
-                        {comments.map(function (comment: CommentData) {
-                            return (<>
-                                <br />
-                                <CommentSimple key={comment._id} body={comment.text} postedAt={comment.createdAt} name={comment.userName} />
-                            </>
-                            )
-                        })}
+
+                        {comments.length > 0 ? (<> <h4>Latest comments:</h4></>) : (<><p></p></>)}
+                        <ScrollArea
+                            style={{ height: 200, scrollbarColor: "red" }}
+                            onScrollPositionChange={onScrollPositionChange}
+                            type="hover"
+                             
+                            
+                            styles={(theme) => ({
+                              scrollbar: {
+                                '&, &:hover': {
+                                  background:
+                                    theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+                                },
+                    
+                                '&[data-orientation="vertical"] .mantine-ScrollArea-thumb': {
+                                  backgroundColor: theme.colors.red[6],
+                                },
+                    
+                                '&[data-orientation="horizontal"] .mantine-ScrollArea-thumb': {
+                                  backgroundColor: theme.colors.blue[6],
+                                },
+                              },
+                    
+                              corner: {
+                                opacity: 1,
+                                background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+                              },
+                            })}
+                        >
+                            {comments.map(function (comment: CommentData) {
+                                return (<>
+                                    <br />
+                                    <CommentSimple key={comment._id} body={comment.text} postedAt={comment.createdAt} name={comment.userName} />
+                                </>
+                                )
+                            })}
+                        </ScrollArea>
                     </Grid.Col>
                 </Grid>
             </SimpleGrid>

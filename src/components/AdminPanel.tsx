@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Navbar, Text, Center, Tooltip, UnstyledButton, createStyles, Stack, Container, Grid, Group, SimpleGrid, Paper, Card, Progress, Flex, TextInput, Button, Textarea, FileButton, Switch, FileInput } from '@mantine/core';
+import { Navbar, Text, Center, Tooltip, UnstyledButton, createStyles, Stack, Container, Grid, Group, SimpleGrid, Paper, Card, Progress, Flex, TextInput, Button, Textarea, FileButton, Switch, FileInput, useMantineTheme } from '@mantine/core';
 import {
     TablerIcon,
     IconHome2,
@@ -12,6 +12,10 @@ import {
     IconLogout,
     IconSwitchHorizontal,
     IconPlus,
+    IconPhoto,
+    IconX,
+    IconUpload,
+    IconMovie,
 } from '@tabler/icons';
 import { MantineLogo } from '@mantine/ds';
 import { useNavigate, Router } from "react-router-dom";
@@ -23,6 +27,7 @@ import DropzoneButton from './DropzoneButton';
 import axios from 'axios';
 import React from 'react';
 import jwt_decode from "jwt-decode";
+import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
 
 const useStyles2 = createStyles((theme) => ({
     root: {
@@ -163,7 +168,7 @@ export function NavbarMinimal() {
             );
         }
 
-
+ 
 
         formData.append('description', description);
         formData.append('name', name);
@@ -185,8 +190,10 @@ export function NavbarMinimal() {
 
         closeAllModals();
     }
-    let addModal = ({
+    var theme = useMantineTheme();
 
+    let addModal = ({
+ 
         title: 'Create new course!',
         children: (
             <>
@@ -195,14 +202,40 @@ export function NavbarMinimal() {
                 <p>Paste youtube link</p>
                 <TextInput label="Youtube link" onChange={(event) => link = event.target.value} />
                 <>
-                    <p>Or you file upload</p>
-                    <Group position="center">
-                        <input type="file" onChange={e => onFileChange(e)}
-                            id="avatar" name="avatar"
-                            accept="image/png, image/jpeg" />
-                    </Group>
+                    <p>Or use file upload</p>
 
+                    <Dropzone accept={[MIME_TYPES.mp4, MIME_TYPES.webp, "video/webm", "video/ogg"]}
+                        onDrop={null}>
+                        <Group position="center" spacing="xl" style={{ minHeight: 100, pointerEvents: 'none' }}>
+                            <Dropzone.Accept>
+                                <IconUpload
+                                    size={50}
+                                    stroke={1.5}
+                                    color={theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 4 : 6]}
+                                />
+                            </Dropzone.Accept>
+                            <Dropzone.Reject>
+                                <IconX
+                                    size={50}
+                                    stroke={1.5}
+                                    color={theme.colors.red[theme.colorScheme === 'dark' ? 4 : 6]}
+                                />
+                            </Dropzone.Reject>
+                            <Dropzone.Idle>
+                                <IconMovie size={50} stroke={1.5} />
+                            </Dropzone.Idle>
+
+                            <div>
+                                <Text size="xl" inline>
+                                    Drag video file of your course
+                                </Text>
+                            
+                            </div>
+                        </Group>
+
+                    </Dropzone>
                 </>
+
                 <Button fullWidth mt="md" onClick={() => addCourse()}>
                     Create course
                 </Button>

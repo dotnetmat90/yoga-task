@@ -20,8 +20,10 @@ router.get("/:id", async (req, res) => {
   console.log(id);
   let user = await Course.findById(id);
   if (user) {
-    if (user.videoUrl)
+    if (user.videoUrl) {
       user.videoUrl = 'http://localhost:4000/' + user.videoUrl;
+      user.videoUrl =user.videoUrl.replace("\\", "/");
+    }
     res.status(200).send(user);
   } else {
     res.status(404).send({ message: "This user does not exist" });
@@ -29,11 +31,25 @@ router.get("/:id", async (req, res) => {
 });
 
 
+router.delete("/:id", async (req, res) => {
+  const course = await Course.findByIdAndDelete(req.params.id);
+  return res.send(course);
+});
+
 router.put("/:id", async (req, res) => {
   const course = await Course.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
   return res.send(course);
 });
 
+router.put("/likes/:id", async (req, res) => {
+  const course = await Course.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
+  return res.send(course);
+});
+
+router.put("/views/:id", async (req, res) => {
+  const course = await Course.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
+  return res.send(course);
+});
 
 router.get("/", async (req, res) => {
   try {

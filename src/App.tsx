@@ -9,35 +9,19 @@ import FooterSocial from './components/Footer';
 import Register from './components/Register';
 import './App.css';
 import Courses from './components/Courses';
+import MyCourses from './components/MyCourses';
+
 import Course from './components/Course';
 import Logout from './components/Logout';
 import { useNavigate } from "react-router-dom";
 import React from 'react';
 import NavbarMinimal from './components/AdminPanel';
 import { useState, useEffect } from 'react';
-import { MantineProvider } from '@mantine/core';
+import { AppShell, MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 
 function App() {
-  // useEffect(() => {
-  //   const loggedIn = localStorage.getItem("accessToken") !== null;
-  //   const login = document.querySelectorAll("a[href='/login']")[0] as HTMLElement;
-  //   const register = document.querySelectorAll("a[href='/register']")[0] as HTMLElement;
-  //   const courses = document.querySelectorAll("a[href='/courses']")[0] as HTMLElement;
-  //   const logout = document.querySelectorAll("a[href='/logout']")[0] as HTMLElement;
-  //   if (loggedIn) {
-  //     login.style.display = 'none';
-  //     register.style.display = 'none';
-  //     courses.style.display = 'block';
-  //     logout.style.display = 'block';
-  //   }
-  //   else {
-  //     login.style.display = 'block';
-  //     register.style.display = 'block';
-  //     courses.style.display = 'none';
-  //     logout.style.display = 'none';
-  //   }
-  // });
+ 
   return (
     <>
 
@@ -55,13 +39,15 @@ function App() {
 
             ]} userLinks={[]} />
 
-
+ 
             <Routes>
               <Route path="/login" element={<Login />}></Route>
 
               <Route path="/register" element={<Register />}></Route>
               <Route path="/courses" element={<Courses />}></Route>
               <Route path="/courses/*" element={<Course />}></Route>
+              <Route path="/my-courses" element={<MyCourses />}></Route>
+
               <Route path="/manage-panel" element={<NavbarMinimal />}></Route>
 
               <Route path="/" element={<Landing />}></Route>
