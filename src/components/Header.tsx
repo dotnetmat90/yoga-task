@@ -1,17 +1,28 @@
-import { useState, useEffect } from 'react';
-import { createStyles, Header, Container, Anchor, Group, Burger, Title } from '@mantine/core';
+import { createStyles, Text, Header, Menu, Group, Center, Burger, Container, Avatar } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { MantineLogo } from '@mantine/ds';
-import { useNavigate, Router } from "react-router-dom";
-
-const HEADER_HEIGHT = 84;
+import { IconChevronDown } from '@tabler/icons';
+import { Navigate, useNavigate } from 'react-router';
+import jwt_decode from "jwt-decode";
+import { useEffect, useRef } from 'react';
 
 const useStyles = createStyles((theme) => ({
+  logo: {
+    fontSize: 36,
+    cursor: "pointer",
+  }
+  ,
+
   inner: {
-    height: HEADER_HEIGHT,
+    height: 56,
     display: 'flex',
-    alignItems: 'center',
     justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+
+  links: {
+    [theme.fn.smallerThan('sm')]: {
+      display: 'none',
+    },
   },
 
   burger: {
@@ -19,128 +30,123 @@ const useStyles = createStyles((theme) => ({
       display: 'none',
     },
   },
-  a: {
-    color: 'black'
-  },
-  links: {
-    paddingTop: theme.spacing.lg,
-    height: HEADER_HEIGHT,
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'space-between',
 
-    [theme.fn.smallerThan('sm')]: {
-      display: 'none',
-    },
-  },
-
-  mainLinks: {
-    marginRight: -theme.spacing.sm,
-  },
-
-  mainLink: {
-    textTransform: 'uppercase',
-    fontSize: 13,
-    color: theme.colorScheme === 'dark' ? theme.colors.dark[1] : theme.colors.gray[6],
-    padding: `7px ${theme.spacing.sm}px`,
-    fontWeight: 700,
-    borderBottom: '2px solid transparent',
-    transition: 'border-color 100ms ease, color 100ms ease',
+  link: {
+    display: 'block',
+    lineHeight: 1,
+    padding: '8px 12px',
+    borderRadius: theme.radius.sm,
+    textDecoration: 'none',
+    color: theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.colors.gray[7],
+    fontSize: theme.fontSizes.sm,
+    fontWeight: 500,
 
     '&:hover': {
-      color: theme.colorScheme === 'dark' ? theme.white : theme.black,
-      textDecoration: 'none',
+      backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
     },
   },
 
-  secondaryLink: {
-    color: theme.colorScheme === 'dark' ? theme.colors.dark[2] : theme.colors.gray[6],
-    fontSize: theme.fontSizes.xs,
-    textTransform: 'uppercase',
-    transition: 'color 100ms ease',
-
-    '&:hover': {
-      color: theme.colorScheme === 'dark' ? theme.white : theme.black,
-      textDecoration: 'none',
-    },
-  },
-
-  mainLinkActive: {
-    color: theme.colorScheme === 'dark' ? theme.white : theme.black,
-    borderBottomColor: theme.colors[theme.primaryColor][theme.colorScheme === 'dark' ? 5 : 6],
+  linkLabel: {
+    marginRight: 5,
   },
 }));
 
-
-
-interface LinkProps {
-  label: string;
-  link: string;
-  loggedOnly: boolean;
+interface HeaderSearchProps {
+  links: { link: string; label: string; links: { link: string; label: string, userType: string }[], userType: string }[];
 }
 
-interface DoubleHeaderProps {
-  mainLinks: LinkProps[];
-  userLinks: LinkProps[];
-}
 
-export function DoubleHeader({ mainLinks, userLinks }: DoubleHeaderProps) {
- 
+export function HeaderMenu({ links }: HeaderSearchProps) {
+  let items = [];
+  const isInitialMount = useRef(true);
+
   const [opened, { toggle }] = useDisclosure(false);
-  const { classes, cx } = useStyles();
-  const [active, setActive] = useState(0);
-  const navigate = useNavigate();
-  const loggedIn = localStorage.getItem("accessToken") !== undefined;
- 
-  const mainItems = mainLinks.map((item, index) => (
-    <Anchor<'a'>
-      href={item.link}
-      key={item.label}
-      className={cx(classes.mainLink, { [classes.mainLinkActive]: index === active })}
-      onClick={(event) => {
-        event.preventDefault();
-        if (item.link.includes("logout")) {
-          localStorage.clear();
-          window.location.href = '/';
-          navigate('/');
+  const { classes } = useStyles();
+  const navigateTo = useNavigate();
+  var token = localStorage.getItem("accessToken") as string;
+  let user = null;
+  if (token) {
+    user = jwt_decode(token) as any;
+  }
 
-          return;
-        }
-        setActive(index);
+  const getUserName = () => {
+    if (!user) return '';
+    return user.firstname[0] + user.lastname[0];
+  }
+  const navigate = (event, link) => {
+    event.preventDefault();
 
-        navigate(item.link);
-      }}
-    >
-      {item.label}
-    </Anchor>
-  ));
+    if (link === "/signout") {
+      window.localStorage.clear();
+      navigateTo("");
+    } else {
+      navigateTo(link)
+    }
+  }
 
-  const secondaryItems = userLinks.map((item) => (
-    <Anchor<'a'>
-      href={item.link}
-      key={item.label}
-      id={item.link.trim().toLowerCase()}
-      onClick={(event) => event.preventDefault()}
-      className={classes.secondaryLink}
-    >
-      {item.label}
-    </Anchor>
-  ));
+  let filterdLinks = links;
+
+  if (!user) {
+    links = filterdLinks.filter(link => link.userType === "none");
+  } else {
+    links = filterdLinks.filter(link => link.userType === user.type);
+
+  }
+
+  items = links.map((link) => {
+    const menuItems = link.links?.filter(item => item.userType === user.type || item.userType === "none").map((item) => (
+      <Menu.Item key={item.link} onClick={(event) => navigate(event, item.link)}>{item.label}</Menu.Item>
+    ));
+
+    if (menuItems) {
+      return (
+        <Menu key={link.label} trigger="hover" exitTransitionDuration={0}>
+          <Menu.Target>
+            <a
+              href={link.link}
+              className={classes.link}
+              onClick={(event) => navigate(event, link.link)}
+            >
+              <Center>
+                {link.label === "User" ? <>
+                <Avatar color="cyan" radius="xl">{getUserName()}</Avatar>
+                </>
+                  :
+                  <> <span className={classes.linkLabel}>{link.label}</span>
+                  </>}
+                <IconChevronDown size={12} stroke={1.5} />
+              </Center>
+            </a>
+          </Menu.Target>
+          <Menu.Dropdown>{menuItems}</Menu.Dropdown>
+        </Menu>
+      );
+    }
+
+    return (
+      <a
+        key={link.label}
+        href={link.link}
+        className={classes.link}
+        onClick={(event) => navigate(event, link.link)}
+      >
+        {link.label}
+      </a>
+    );
+  });
 
   return (
-    <Header height={HEADER_HEIGHT} mb={20}>
-      <Container className={classes.inner}>
-        <Title style={{ cursor: 'pointer' }} order={1} onClick={(event) => navigate("/")}>Suffice</Title>
-        <div className={classes.links}>
-          <Group position="right">{secondaryItems}</Group>
-          <Group spacing={0} position="right" className={classes.mainLinks}>
-            {mainItems}
+    <Header height={60}  >
+      <Container>
+        <div className={classes.inner}>
+          <Text onClick={(event) => navigate(event, "/")} className={classes.logo} >Suffice </Text>
+          <Group spacing={5} className={classes.links}>
+            {items}
           </Group>
+          <Burger opened={opened} onClick={toggle} className={classes.burger} size="sm" />
         </div>
-        <Burger opened={opened} onClick={toggle} className={classes.burger} size="sm" />
       </Container>
     </Header>
   );
 }
 
-export default DoubleHeader;

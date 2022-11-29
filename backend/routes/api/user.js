@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const User = require("../../models/userModel");
+const UserWatchedCourses = require("../../models/userWatchModel");
 
 router.get("/", async (req, res) => {
   try {
@@ -27,6 +28,24 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.get("/courses/:id", async (req, res) => {
+  let user = await UserWatchedCourses.find({ userId: req.params.id});
+  if (user) {
+    res.status(200).send(user);
+  } else {
+    res.status(404).send({ message: "This user does not exist" });
+  }
+});
+
+router.put("/courses/:id", async (req, res) => {
+  let user = await UserWatchedCourses.findOneAndUpdate({ userId: req.params.id}, { $set: req.body }, { new: true });
+  if (user) {
+    res.status(200).send(user);
+  } else {
+    res.status(404).send({ message: "This user does not exist" });
+  }
+});
+
 router.get("/:id", async (req, res) => {
   let user = await User.findById(req.params.id);
   if (user) {
@@ -37,7 +56,7 @@ router.get("/:id", async (req, res) => {
 });
 
 router.put("/:id", async (req, res) => {
-  const course = await User.findByIdAndUpdate(req.params.id ,{$set:req.body},{new:true});
+  const course = await User.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
   return res.send(course);
 });
 
@@ -49,7 +68,7 @@ router.post("/login", async (req, res) => {
   let user = await User.findOne({ email: email, password: password });
   if (user) {
     console.log(user);
-    if(user.type == "" || !user.type) {
+    if (user.type == "" || !user.type) {
       user.type = "student";
     }
     const signedUser = {
@@ -59,8 +78,8 @@ router.post("/login", async (req, res) => {
       firstname: user.firstname,
       type: user.type
     }
-    const accessToken = jwt.sign(signedUser,process.env.SECRET_KEY);
-    res.status(200).json({accessToken:accessToken});
+    const accessToken = jwt.sign(signedUser, process.env.SECRET_KEY);
+    res.status(200).json({ accessToken: accessToken });
   } else {
     res.status(404).send({ message: "Invalid Password or Email" });
   }

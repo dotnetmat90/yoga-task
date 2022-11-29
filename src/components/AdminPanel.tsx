@@ -1,33 +1,23 @@
 import { useState } from 'react';
-import { Navbar, Text, Center, Tooltip, UnstyledButton, createStyles, Stack, Container, Grid, Group, SimpleGrid, Paper, Card, Progress, Flex, TextInput, Button, Textarea, FileButton, Switch, FileInput, useMantineTheme } from '@mantine/core';
+import { Navbar, Text, Center, Tooltip, UnstyledButton, createStyles, Stack, Container, Group, SimpleGrid, Flex, TextInput, Button, Textarea, useMantineTheme, Box } from '@mantine/core';
 import {
     TablerIcon,
-    IconHome2,
-    IconGauge,
-    IconDeviceDesktopAnalytics,
-    IconFingerprint,
-    IconCalendarStats,
-    IconUser,
     IconSettings,
     IconLogout,
-    IconSwitchHorizontal,
     IconPlus,
-    IconPhoto,
     IconX,
     IconUpload,
     IconMovie,
 } from '@tabler/icons';
-import { MantineLogo } from '@mantine/ds';
-import { useNavigate, Router } from "react-router-dom";
+import { Route, useNavigate } from "react-router-dom";
 import StatsRing, { StatsRingProps } from './StatsRing';
-import { stat } from 'fs';
 import StatsGroup, { StatsGroupProps } from './GroupedStats';
 import { openModal, closeAllModals } from '@mantine/modals';
-import DropzoneButton from './DropzoneButton';
 import axios from 'axios';
 import React from 'react';
 import jwt_decode from "jwt-decode";
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
+import MyCourses from './MyCourses';
 
 const useStyles2 = createStyles((theme) => ({
     root: {
@@ -54,6 +44,7 @@ const useStyles2 = createStyles((theme) => ({
         fontWeight: 700,
         textTransform: 'uppercase',
     },
+
 }));
 
 
@@ -168,7 +159,7 @@ export function NavbarMinimal() {
             );
         }
 
- 
+
 
         formData.append('description', description);
         formData.append('name', name);
@@ -190,10 +181,15 @@ export function NavbarMinimal() {
 
         closeAllModals();
     }
+
+    const setupFile = (data: File[]) => {
+        file = data[0];
+    }
+
     var theme = useMantineTheme();
 
     let addModal = ({
- 
+
         title: 'Create new course!',
         children: (
             <>
@@ -205,7 +201,7 @@ export function NavbarMinimal() {
                     <p>Or use file upload</p>
 
                     <Dropzone accept={[MIME_TYPES.mp4, MIME_TYPES.webp, "video/webm", "video/ogg"]}
-                        onDrop={null}>
+                        onDrop={(file) => setupFile(file)}>
                         <Group position="center" spacing="xl" style={{ minHeight: 100, pointerEvents: 'none' }}>
                             <Dropzone.Accept>
                                 <IconUpload
@@ -229,7 +225,7 @@ export function NavbarMinimal() {
                                 <Text size="xl" inline>
                                     Drag video file of your course
                                 </Text>
-                            
+
                             </div>
                         </Group>
 
@@ -263,7 +259,7 @@ export function NavbarMinimal() {
     const stats = {
         data: [
             {
-                label: 'Incrase %',
+                label: 'A %',
                 color: 'red',
                 icon: 'down',
                 progress: 20,
@@ -271,7 +267,7 @@ export function NavbarMinimal() {
 
             },
             {
-                label: 'Increase %',
+                label: 'l %',
                 color: 'blue',
                 icon: 'up',
                 progress: 10,
@@ -309,35 +305,23 @@ export function NavbarMinimal() {
                 direction="row"
                 wrap="nowrap"
             >
-                <div>
-                    <Navbar height={750} width={{ base: 80 }} p="md">
-                        <Center>
-                            <h2>S</h2>
-                        </Center>
-                        <Navbar.Section grow mt={0}>
-                            <Stack justify="center" spacing={0}>
-                                {links}
-                            </Stack>
-                        </Navbar.Section>
-                        <Navbar.Section>
-                            <Stack justify="center" spacing={0}>
-                                <NavbarLink icon={IconLogout} label="Logout" onClick={() => navigate("/")} />
-                            </Stack>
-                        </Navbar.Section>
 
-                    </Navbar>
-                </div>
-                <div>
-                    <Container>
-                        <h2>Course statistics</h2>
-                        <>
-                            <StatsGroup data={groupedStats.data}></StatsGroup>
-                            <br />
-                            <SimpleGrid cols={1} spacing="lg" verticalSpacing="xs">
-                                <StatsRing data={stats.data}></StatsRing>
-                            </SimpleGrid>
-                        </>
-                    </Container>
+                <div  >
+                    <Center mt={0} mr={800} style={{  width: '100%', height: 500 }}>
+                        <Box> 
+                            <h2>Course statistics</h2>
+
+
+                            <>
+                                <StatsGroup data={groupedStats.data}></StatsGroup>
+                                <br />
+                                <SimpleGrid cols={1} spacing="lg" verticalSpacing="xs">
+                                    <StatsRing data={stats.data}></StatsRing>
+                                </SimpleGrid>
+                            </>
+                        </Box>
+                    </Center>
+
                 </div>
 
             </Flex>

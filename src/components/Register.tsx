@@ -15,6 +15,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { showNotification } from '@mantine/notifications';
+import DropzoneButton from './DropzoneButton';
 
 const useStyles = createStyles((theme) => ({
     wrapper: {
@@ -126,6 +127,7 @@ export function Register() {
                 <TextInput label="Email address" placeholder="hello@gmail.com" size="md" onChange={(e) => setEmail(e.target.value)} />
                 <PasswordInput label="Password" placeholder="Your password" mt="md" size="md" onChange={(e) => setPassword(e.target.value)} />
 
+ 
                 <Switch checked={checked} label={checked ? 'I am creator' : 'I am student '} onChange={(event) => setChecked(event.currentTarget.checked)} />
 
                 {checked ? (<>
@@ -140,7 +142,7 @@ export function Register() {
                     ]}
                 /></p></>}
 
-
+ 
                 <Button fullWidth mt="xl" size="md" onClick={(e) => handleSubmit(e)}>
                     Register
                 </Button>

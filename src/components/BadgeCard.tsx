@@ -1,4 +1,4 @@
-import { IconHeart } from '@tabler/icons';
+import { IconDeviceFloppy, IconFile, IconFileDislike, IconHeart } from '@tabler/icons';
 import { Card, Image, Text, Group, Badge, Button, ActionIcon, createStyles, Center } from '@mantine/core';
 import ReactPlayer from 'react-player'
 import { useNavigate } from 'react-router-dom';
@@ -102,7 +102,10 @@ export function BadgeCard({ id, image, video, title, description, country, badge
           Watch
         </Button>
         <ActionIcon variant="default" radius="md" size={36}>
-          <IconHeart size={18} className={classes.like} fill={"red"}  stroke={1.5} />
+          <IconHeart size={18} className={classes.like} fill={"red"}  stroke={1.5} /> 
+        </ActionIcon>
+        <ActionIcon variant="default" radius="md" size={36}>
+          <IconDeviceFloppy size={18}     stroke={1.5} />
         </ActionIcon>
       </Group>
     </Card>

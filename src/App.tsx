@@ -1,62 +1,76 @@
 import { Route, Routes } from 'react-router';
-import DoubleHeader from './components/Header';
+import { HeaderMenu } from './components/Header';
 import Login from './components/Login';
 import Landing from './components/Landing';
 import { BrowserRouter } from 'react-router-dom';
 import NoHeader from './components/NoHeader';
 import FooterSocial from './components/Footer';
- import { NotificationsProvider } from '@mantine/notifications';
+import { NotificationsProvider } from '@mantine/notifications';
 import Register from './components/Register';
 import './App.css';
 import Courses from './components/Courses';
 import MyCourses from './components/MyCourses';
 
 import Course from './components/Course';
-import Logout from './components/Logout';
-import { useNavigate } from "react-router-dom";
-import React from 'react';
 import NavbarMinimal from './components/AdminPanel';
-import { useState, useEffect } from 'react';
-import { AppShell, MantineProvider } from '@mantine/core';
+import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
+import Settings from './components/Settings';
+import NotFound from './components/NotFound';
 
 function App() {
- 
+
   return (
     <>
 
       <BrowserRouter>
         <MantineProvider withNormalizeCSS withGlobalStyles >
           <NotificationsProvider position="top-right">
-          <ModalsProvider>
-            <DoubleHeader mainLinks={[
-              { link: "/login", label: 'Login', loggedOnly: false },
-              { link: "/register", label: 'Register', loggedOnly: false },
-              { link: "/courses", label: 'Courses', loggedOnly: true },
-              { link: "/manage-panel", label: 'Management', loggedOnly: true },
+            <ModalsProvider>
+              <HeaderMenu links={[
+                { label: "Login", link: "/login", links: null, userType: "none" },
+                { label: "Register", link: "/register", links: null, userType: "none" },
+                { label: "Courses", link: "/courses", links: null, userType: "student" },
+                { label: "Settings", link: "/settings", links: null, userType: "student" },
+                { label: "Sign out", link: "/signout", links: null, userType: "student" },
 
-              { link: "/logout", label: 'Sign out', loggedOnly: true },
+                {
+                  label: "User", link: "/manage-panel", userType: "creator", links: [
+                    {
+                      label: "Management", link: "/manage-panel", userType: "creator"
 
-            ]} userLinks={[]} />
+                    },
+                    {
+                      label: "My courses", link: "/my-courses", userType: "creator"
 
- 
-            <Routes>
-              <Route path="/login" element={<Login />}></Route>
+                    },
 
-              <Route path="/register" element={<Register />}></Route>
-              <Route path="/courses" element={<Courses />}></Route>
-              <Route path="/courses/*" element={<Course />}></Route>
-              <Route path="/my-courses" element={<MyCourses />}></Route>
+                    { label: "Settings", link: "/settings", userType: "none" },
+                    { label: "Sign out", link: "/signout", userType: "none" }
+                  ]
+                },
 
-              <Route path="/manage-panel" element={<NavbarMinimal />}></Route>
+              ]} />
 
-              <Route path="/" element={<Landing />}></Route>
 
-            </Routes>
-            {
-              window.location.href.includes("login") != true ? (<FooterSocial />
-              ) : (<NoHeader></NoHeader>)
-            }
+              <Routes>
+                <Route path="/login" element={<Login />}></Route>
+                <Route path="/register" element={<Register />}></Route>
+                <Route path="/courses" element={<Courses />}></Route>
+                <Route path="/courses/*" element={<Course />}></Route>
+                <Route path="/my-courses" element={<MyCourses />}></Route>
+                <Route path="/settings" element={<Settings />}></Route>
+
+                <Route path="/manage-panel" element={<NavbarMinimal />}></Route>
+
+                <Route path="/" element={<Landing />}></Route>
+                <Route path="*" element={<NotFound />} />
+
+              </Routes>
+              {
+                window.location.href.includes("login") != true ? (<FooterSocial />
+                ) : (<NoHeader></NoHeader>)
+              }
             </ModalsProvider>
           </NotificationsProvider>
         </MantineProvider>
