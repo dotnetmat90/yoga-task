@@ -9,6 +9,8 @@ import { useState, useEffect } from 'react';
 import CourseEditBadge from './CourseEditBadge';
 import { closeAllModals, openConfirmModal, openModal } from '@mantine/modals';
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone';
+import { useForm } from '@mantine/form';
+import { showNotification } from '@mantine/notifications';
 
 const useStyles = createStyles((theme) => ({
     footer: {
@@ -39,8 +41,8 @@ const useStyles = createStyles((theme) => ({
 
 export function MyCourses() {
     const [updated, setUpdated] = useState<false>(false);
-    const [name, setName] = useState('');
-    const [description, setDescription] = useState('');
+    let [name, setName] = useState('');
+    let [description, setDescription] = useState('');
 
     const { classes } = useStyles();
     const navigate = useNavigate();
@@ -66,20 +68,55 @@ export function MyCourses() {
 
         setSearchedCourses(searchedCourses);
     }
+
+    let editForm = useForm({
+        initialValues: { name: localStorage.getItem("courseName"), description: '' },
+
+        validate: {
+            name: (value) => (value.length < 2 ? 'Name must have at least 2 letters' : null),
+            description: (value) => (value.length < 10 ? 'Description must have at least 10 letters' : null)
+        },
+    });
+
+    let editedName = ''
+    let editedDescription = '';
+
+
+    
+    const updateCourseDetails = (courseId: string) => {
+        console.log(editedName);
+        console.log(editedDescription);
+
+        const data = {
+            name : editedName,
+            description: editedDescription
+        };
+
+        axios
+        .put("http://localhost:4000/api/courses/" + courseId, data)
+        .then((response) => {
+            window.location.reload();
+        })
+        .catch((error) => {
+            console.log(error);
+        });
+
+    }
+
     const openEditModal = (courseId: string) => {
         var selected = courses.find(course => course._id === courseId);
 
-
+        localStorage.setItem("courseName", selected.name);
 
 
         openModal({
             title: 'Edit course details',
             children: (
                 <>
-                    <TextInput label="Course name" onChange={(event) => setName(event.currentTarget.value)} data-autofocus />
-                    <Textarea label="Course description" onChange={(event) => setDescription(event.currentTarget.value)} data-autofocus />
+                    <TextInput required label="Course name"   data-autofocus  onChange={(event) => editedName = event.currentTarget.value}  defaultValue={selected.name} />
+                    <Textarea required label="Course description" onChange={(event) => editedDescription =event.currentTarget.value} defaultValue={selected.description} data-autofocus />
 
-                    <Button fullWidth onClick={closeAllModals} mt="md">
+                    <Button fullWidth type='submit' onClick={() => updateCourseDetails(courseId)} mt="md">
                         Submit
                     </Button>
                 </>
@@ -88,6 +125,17 @@ export function MyCourses() {
 
         setName(selected.name);
         setDescription(selected.description);
+    }
+
+    const deleteCourse = (courseId: string) => {
+        axios
+            .delete("http://localhost:4000/api/courses/" + courseId)
+            .then((response) => {
+                window.location.reload();
+            })
+            .catch((error) => {
+                console.log(error);
+            });
     }
 
     const openDeleteModal = (courseId: string) => {
@@ -107,39 +155,72 @@ export function MyCourses() {
             labels: { confirm: 'Delete', cancel: "No don't delete it" },
             confirmProps: { color: 'red' },
             onCancel: () => console.log('Cancel'),
-            onConfirm: () => console.log('Confirmed'),
+            onConfirm: () => deleteCourse(courseId)
         })
     };
+
+
 
     const getCourses = () => {
         axios
             .get("http://localhost:4000/api/courses")
             .then((response) => {
-                response.data.forEach((item: any) => {
-                    if (item.link)
-                        item.image = grabLink(item.link, 'max');
-                    item.viewUrl = "/courses/" + item._id;
-                });
+                if (response.data) {
+                    response.data.forEach((item: any) => {
+                        if (item.link)
+                            item.image = grabLink(item.link, 'max');
+                        item.viewUrl = "/courses/" + item._id;
+                    });
 
-                var user = jwt_decode(localStorage.getItem("accessToken") as string) as any;
+                    var user = jwt_decode(localStorage.getItem("accessToken") as string) as any;
 
-                const userCourses = response.data.filter(course => course.createdBy == user._id)
-                setCourses(userCourses);
-                setSearchedCourses(userCourses);
+                    const userCourses = response.data.filter(course => course.createdBy == user._id)
+                    setCourses(userCourses);
+                    setSearchedCourses(userCourses);
+                }
             })
             .catch((error) => {
                 console.log(error);
             });
     };
 
-     let link = '';
-     let file = {} as any;
+    let link = '';
+    let file = {} as any;
+    let filename = "";
 
     let onFileChange = (event: any) => {
 
         // Update the state
         file = event.target.files[0];
+        filename = file.name;
+    }
 
+    const addCourseForm = useForm({
+        initialValues: { name, description },
+
+        validate: {
+            name: (value) => (value.length < 2 ? 'Name must have at least 2 letters' : null),
+            description: (value) => (value.length < 10 ? 'Description must have at least 10 letters' : null)
+        },
+    });
+
+
+
+
+    const setupFile = (data: File[]) => {
+        file = data[0];
+    }
+
+    var theme = useMantineTheme();
+
+    var addName = '';
+    var addDesc = '';
+    const setAddModalName = (value: string) => {
+        addName = value;
+    }
+
+    const setAddModalDesc = (value: string) => {
+        addDesc = value;
     }
 
 
@@ -159,8 +240,8 @@ export function MyCourses() {
 
 
 
-        formData.append('description', description);
-        formData.append('name', name);
+        formData.append('description', addName);
+        formData.append('name', addDesc);
         formData.append('link', link);
         formData.append('createdBy', user._id);
         axios
@@ -170,9 +251,18 @@ export function MyCourses() {
                 link = '';
                 setName('')
                 file = {} as any;
+                if (user.type === "creator") {
+                    window.location.reload();
+                    return;
+                }
                 navigate("/courses");
             }).catch((error) => {
-                console.log(error);
+
+                showNotification({
+                    title: 'Could not add course',
+                    color: 'red',
+                    message: error.code === "ERR_BAD_REQUEST" ? `Course with name ${addName} already exists!` : "Error. Could not add course. Contact admin!"
+                })
             });
 
 
@@ -180,26 +270,21 @@ export function MyCourses() {
         closeAllModals();
     }
 
-    const setupFile = (data: File[]) => {
-        file = data[0];
-    }
-
-    var theme = useMantineTheme();
-
     let addModal = ({
 
         title: 'Create new course!',
         children: (
             <>
-                <TextInput required={true} label="Course name" placeholder="Course name" onChange={(event) => setName(event.target.value)} data-autofocus />
-                <Textarea required={true} label="Description" onChange={(event) => setDescription(event.target.value)} />
-                <p>Paste youtube link</p>
-                <TextInput label="Youtube link" onChange={(event) => link = event.target.value} />
+
+                <TextInput required={true} label="Course name" placeholder="Course name" onChange={(event) => setAddModalName(event.target.value)} data-autofocus />
+                <Textarea required={true} label="Description" onChange={(event) => setAddModalDesc(event.target.value)} />
+                <p>Paste youtube link. If you add youtube link and video file. Youtube link will be set as default</p>
+                <TextInput label="Youtube link" disabled={filename.length > 0} onChange={(event) => link = event.target.value} />
                 <>
                     <p>Or use file upload</p>
 
                     <Dropzone accept={[MIME_TYPES.mp4, MIME_TYPES.webp, "video/webm", "video/ogg"]}
-                        onDrop={(file)=> setupFile(file)}>
+                        onDrop={(file) => setupFile(file)}>
                         <Group position="center" spacing="xl" style={{ minHeight: 100, pointerEvents: 'none' }}>
                             <Dropzone.Accept>
                                 <IconUpload
@@ -253,7 +338,7 @@ export function MyCourses() {
                     </Center>
                     <Group>
 
-                        <Button color="red" radius="xs" size="md" onClick={()=>  openModal(addModal)} uppercase>
+                        <Button color="red" radius="xs" size="md" onClick={() => openModal(addModal)} uppercase>
                             <IconPlus >Add</IconPlus>
                         </Button>
                         <Input onChange={(e: any) => search(e.target.value)}
@@ -270,7 +355,7 @@ export function MyCourses() {
 
             <Container className={classes.inner}>
                 <SimpleGrid cols={3}>
-    
+
                     {searchedCourses.map(function (course: any) {
                         return (<CourseEditBadge id={course._id} editAction={openEditModal} deleteAction={openDeleteModal} key={course._id} image={course.image} title={course.name} video={course.videoUrl} country={''} description={course.description} badges={[]}></CourseEditBadge>)
                     })}

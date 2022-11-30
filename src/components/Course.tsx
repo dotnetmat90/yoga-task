@@ -1,4 +1,4 @@
-import { createStyles, Container, Text, ScrollArea, Code, Group, ActionIcon, Footer, Title, SimpleGrid, Input, Grid, CloseButton, Textarea, Button, Switch } from '@mantine/core';
+import { createStyles, Container, Text, ScrollArea, Code, Group, ActionIcon, Footer, Title, SimpleGrid, Input, Grid, CloseButton, Textarea, Button, Switch, Checkbox, Rating, Flex } from '@mantine/core';
 import { IconBrandTwitter, IconBrandYoutube, IconBrandInstagram, IconSearch } from '@tabler/icons';
 import { useNavigate } from 'react-router-dom';
 import jwt_decode from "jwt-decode";
@@ -161,13 +161,15 @@ export function Course() {
                 console.log(error);
             });
     };
+    
 
     React.useEffect(getCourse, []);
     React.useEffect(getComments, []);
     const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
 
-
-
+    const updatedRating = (value) => {
+        
+    }
     return (
 
         <Container my="md">
@@ -197,6 +199,10 @@ export function Course() {
                         {/* <Switch checked={finished} label="Mark finished" onClick={() => courseFinished()} /> */}
                     </Grid.Col>
                     <Grid.Col>
+                        <Rating defaultValue={0} onChange={(val)=> updatedRating(val)} style={{ float: "right" }} />
+                        <br />
+                        {user.type === "creator" ? <></> : <>                        <Checkbox label="Mark as finished"> </Checkbox>
+                        </>}
                         <hr />
                         <h4>Comments</h4>
                         <SimpleGrid cols={1} spacing="md" breakpoints={[{ maxWidth: 'lg', cols: 1 }]}>
@@ -222,28 +228,28 @@ export function Course() {
                             style={{ height: 200, scrollbarColor: "red" }}
                             onScrollPositionChange={onScrollPositionChange}
                             type="hover"
-                             
-                            
+
+
                             styles={(theme) => ({
-                              scrollbar: {
-                                '&, &:hover': {
-                                  background:
-                                    theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+                                scrollbar: {
+                                    '&, &:hover': {
+                                        background:
+                                            theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
+                                    },
+
+                                    '&[data-orientation="vertical"] .mantine-ScrollArea-thumb': {
+                                        backgroundColor: theme.colors.red[6],
+                                    },
+
+                                    '&[data-orientation="horizontal"] .mantine-ScrollArea-thumb': {
+                                        backgroundColor: theme.colors.blue[6],
+                                    },
                                 },
-                    
-                                '&[data-orientation="vertical"] .mantine-ScrollArea-thumb': {
-                                  backgroundColor: theme.colors.red[6],
+
+                                corner: {
+                                    opacity: 1,
+                                    background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
                                 },
-                    
-                                '&[data-orientation="horizontal"] .mantine-ScrollArea-thumb': {
-                                  backgroundColor: theme.colors.blue[6],
-                                },
-                              },
-                    
-                              corner: {
-                                opacity: 1,
-                                background: theme.colorScheme === 'dark' ? theme.colors.dark[6] : theme.colors.gray[0],
-                              },
                             })}
                         >
                             {comments.map(function (comment: CommentData) {

@@ -130,7 +130,7 @@ export function Register() {
  
                 <Switch checked={checked} label={checked ? 'I am creator' : 'I am student '} onChange={(event) => setChecked(event.currentTarget.checked)} />
 
-                {checked ? (<>
+                {/* {checked ? (<>
                 </>) : <><p><Select
                     label="Choose subscription type"
                     placeholder="Pick one"
@@ -140,7 +140,7 @@ export function Register() {
                         { value: 'month', label: 'Monthly' },
 
                     ]}
-                /></p></>}
+                /></p></>} */}
 
  
                 <Button fullWidth mt="xl" size="md" onClick={(e) => handleSubmit(e)}>

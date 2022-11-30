@@ -86,8 +86,7 @@ export function CourseEditBadge({ id, image, video, title, deleteAction, editAct
                     <Text size="lg" weight={500}>
                         {title}
                     </Text>
-                    <Badge size="sm">{country}</Badge>
-                </Group>
+                 </Group>
                 <Text size="sm" mt="xs">
 
                 </Text>

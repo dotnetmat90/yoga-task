@@ -1,5 +1,5 @@
 import { IconDeviceFloppy, IconFile, IconFileDislike, IconHeart } from '@tabler/icons';
-import { Card, Image, Text, Group, Badge, Button, ActionIcon, createStyles, Center } from '@mantine/core';
+import { Card, Image, Text, Group, Badge, Button, ActionIcon, createStyles, Center, Rating } from '@mantine/core';
 import ReactPlayer from 'react-player'
 import { useNavigate } from 'react-router-dom';
 
@@ -31,9 +31,12 @@ interface BadgeCardProps {
   id: string;
   image: string;
   title: string;
+  likes: string;
   video: string;
+  onLike;
   country: string;
   description: string;
+  rating: number,
   badges: {
     emoji: string;
     label: string;
@@ -41,7 +44,7 @@ interface BadgeCardProps {
 }
 
 
-export function BadgeCard({ id, image, video, title, description, country, badges }: BadgeCardProps) {
+export function BadgeCard({ id, image, likes, onLike, video, rating, title, description, country, badges }: BadgeCardProps) {
 
   const navigate = useNavigate();
 
@@ -73,7 +76,7 @@ export function BadgeCard({ id, image, video, title, description, country, badge
               <Image src={image} alt={title} height={180} />
             </Center>
           </>)}
-
+        
       </Card.Section>
 
       <Card.Section className={classes.section} mt="md">
@@ -84,7 +87,7 @@ export function BadgeCard({ id, image, video, title, description, country, badge
           <Badge size="sm">{country}</Badge>
         </Group>
         <Text size="sm" mt="xs">
-           
+        <Rating defaultValue={rating} readOnly/>
         </Text>
       </Card.Section>
 
@@ -101,12 +104,10 @@ export function BadgeCard({ id, image, video, title, description, country, badge
         <Button radius="md" style={{ flex: 1 }} onClick={(e:any) => navigate('/courses/' + id)}>
           Watch
         </Button>
-        <ActionIcon variant="default" radius="md" size={36}>
-          <IconHeart size={18} className={classes.like} fill={"red"}  stroke={1.5} /> 
+        <ActionIcon variant="default" radius="md" size={36} onClick={()=> onLike(id)}>
+          <IconHeart size={20} className={classes.like} fill={"red"}  stroke={1.5} />  <span></span>{likes}
         </ActionIcon>
-        <ActionIcon variant="default" radius="md" size={36}>
-          <IconDeviceFloppy size={18}     stroke={1.5} />
-        </ActionIcon>
+
       </Group>
     </Card>
   );
