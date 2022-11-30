@@ -56,7 +56,7 @@ app.use(function (err, req, res, next) {
 });
 
 mongoose
-  .connect("mongodb://mongoadmin:secret@localhost:27888/yoga?authSource=admin.")
+  .connect("mongodb://localhost/yoga")
   .then(() => {
     console.log("Connected");
   })
