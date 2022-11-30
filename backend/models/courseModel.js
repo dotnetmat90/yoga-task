@@ -10,7 +10,8 @@ const courseModel = mongoose.Schema(
     videoUrl: { type: String },
     likes: { type: Number },
     watchedByNumber: { type: Number },
-    views : {type: Number}
+    views : {type: Number},
+    rating: {type:Number}
   },
   { timestamps: true }
 );

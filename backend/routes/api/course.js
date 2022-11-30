@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Course = require("../../models/courseModel");
+const UserCourses = require("../../models/userCourses")
 const bodyParser = require('body-parser');
 const fs = require('fs');
 const multer = require('multer');
@@ -22,7 +23,7 @@ router.get("/:id", async (req, res) => {
   if (user) {
     if (user.videoUrl) {
       user.videoUrl = 'http://localhost:4000/' + user.videoUrl;
-      user.videoUrl =user.videoUrl.replace("\\", "/");
+      user.videoUrl = user.videoUrl.replace("\\", "/");
     }
     res.status(200).send(user);
   } else {
@@ -39,6 +40,34 @@ router.delete("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   const course = await Course.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
   return res.send(course);
+});
+
+router.get("/userlikes/:id", async (req, res) => {
+  console.log(req.params.id)
+  const course = await UserCourses.find({ userId: req.params.id});
+
+  return res.send(course);
+
+});
+
+
+router.put("/likes/user/:id", async (req, res) => {
+  console.log(req.body)
+  const course = await UserCourses.findOne({likedCourses: req.body.courseId});
+  if (course !== null) {
+    return res.send(course);
+
+  } else {
+    var created = new UserCourses({
+      userId: req.params.id
+    });
+
+    created.likedCourses = req.body.courseId;
+    console.log(created)
+    await created.save();
+    return res.send(created);
+
+  }
 });
 
 router.put("/likes/:id", async (req, res) => {
@@ -83,8 +112,8 @@ router.post('/', upload.single('myFile'), async function (req, res, next) {
     return res.status(400).send({ message: "This Course is already registered" });
   } else {
     console.log(req)
-    if(req.file) {
-    req.body.videoUrl = req.file.path;
+    if (req.file) {
+      req.body.videoUrl = req.file.path;
     }
     course = new Course(req.body);
     await course.save();
