@@ -142,16 +142,15 @@ export function Courses() {
 
     };
 
+    const getRating =() => {
+        return Math.floor(Math.random() * 5);
+
+    }
     const continueToWatch = courses.map((course) => ({ image: course.image, video: course.videoUrl, title: course.name, id: course._id }));
 
     return (
         <div >
-            {/* <Container className={classes.footer} style={{ marginTop: 0, marginBottom: 20, borderBottom: "1px solid" }}>
-                <h4>Continue to watch:</h4>
 
-                <CardsCarousel data={continueToWatch} />
-                <br />
-            </Container> */}
             <Container className={classes.footer} style={{ marginTop: 0, marginBottom: 20, borderBottom: "1px solid" }}>
                 <h4>Favourite courses</h4>
 
@@ -195,7 +194,7 @@ export function Courses() {
                 <SimpleGrid cols={3}>
 
                     {searchedCourses.map(function (course: any) {
-                        return (<BadgeCard onLike={likeCourse} likes={course.likes} rating={course.rating} id={course._id} key={course._id} image={course.image} title={course.name} video={course.videoUrl} country={''} description={course.description} badges={[]}></BadgeCard>)
+                        return (<BadgeCard onLike={likeCourse} likes={course.likes} rating={getRating()} id={course._id} key={course._id} image={course.image} title={course.name} video={course.videoUrl} country={''} description={course.description} badges={[]}></BadgeCard>)
                     })}
                 </SimpleGrid>
             </Container>
