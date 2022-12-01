@@ -44,6 +44,9 @@ export interface CourseData {
     videoUrl: string;
     _id: string,
     createdBy: string;
+    rating: number;
+    views: number;
+    totalVotes: number;
 }
 
 export interface UserData {
@@ -148,8 +151,65 @@ export function Course() {
     const getCourse = () => {
 
         const id = window.location.pathname.replace('/courses/', '');
+
+
+
+
         axios
             .get(`http://localhost:4000/api/courses/` + id)
+            .then((response) => {
+                if (response.data.link) {
+                    const val = response.data.link.split('?v=')[1].split('&')[0];
+                    response.data.link = "https://www.youtube.com/embed/" + val;
+                }
+                response.data.views ++;
+                setCourse(response.data as CourseData);
+                response.data.views --;
+
+                if (!response.data.views) {
+                    response.data.views = 0;
+                }
+
+                const data = {
+                    views: response.data.views + 1
+                }
+                axios.put(`http://localhost:4000/api/courses/` + id, data)
+                    .then((response) => {
+                        console.log(response)
+                    })
+                    .catch((error) => {
+
+                    });
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
+    };
+
+
+    React.useEffect(getCourse, []);
+    React.useEffect(getComments, []);
+    const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
+
+    const updatedRating = (value) => {
+        if (!course.totalVotes) {
+            course.totalVotes = 1;
+        } else {
+            course.totalVotes++;
+        }
+        if (!course.rating) {
+            course.rating = 1;
+        }
+        let newRating = (course.rating * 5) / course.totalVotes;
+        if (newRating > 5) newRating = 5;
+        const data = {
+            rating: newRating,
+            totalVotes: course.totalVotes
+        }
+
+        axios
+            .put(`http://localhost:4000/api/courses/` + course._id, data)
             .then((response) => {
                 if (response.data.link) {
                     const val = response.data.link.split('?v=')[1].split('&')[0];
@@ -160,15 +220,6 @@ export function Course() {
             .catch((error) => {
                 console.log(error);
             });
-    };
-    
-
-    React.useEffect(getCourse, []);
-    React.useEffect(getComments, []);
-    const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
-
-    const updatedRating = (value) => {
-        
     }
     return (
 
@@ -199,10 +250,9 @@ export function Course() {
                         {/* <Switch checked={finished} label="Mark finished" onClick={() => courseFinished()} /> */}
                     </Grid.Col>
                     <Grid.Col>
-                        <Rating defaultValue={0} onChange={(val)=> updatedRating(val)} style={{ float: "right" }} />
+                        <Rating defaultValue={course.rating} onChange={(val) => updatedRating(val)} style={{ float: "right" }} />
                         <br />
-                        {user.type === "creator" ? <></> : <>                        <Checkbox label="Mark as finished"> </Checkbox>
-                        </>}
+
                         <hr />
                         <h4>Comments</h4>
                         <SimpleGrid cols={1} spacing="md" breakpoints={[{ maxWidth: 'lg', cols: 1 }]}>
@@ -263,7 +313,8 @@ export function Course() {
                     </Grid.Col>
                 </Grid>
             </SimpleGrid>
-
+            <br/>
+           <Text style={{float:"right"}}>  Views {course.views}</Text>
 
         </Container>
     );

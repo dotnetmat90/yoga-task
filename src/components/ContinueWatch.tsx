@@ -46,10 +46,10 @@ interface CardProps {
   image: string;
   title: string;
   video: string;
-  id: string;
+  _id: string;
 }
 
-function Card({ image, title, video, id }: CardProps) {
+function Card({ image, title, video, _id }: CardProps) {
   const { classes } = useStyles();
   const navigate = useNavigate();
 
@@ -79,7 +79,7 @@ function Card({ image, title, video, id }: CardProps) {
         </Title>
       </div>
       <br/>
-      <Button variant="filled" onClick={()=>  navigate('/courses/' + id)} size={"xs"} color="blue">
+      <Button variant="filled" onClick={()=>  navigate('/courses/' + _id)} size={"xs"} color="blue">
         Watch
       </Button>
     </Paper>
@@ -90,7 +90,7 @@ export default interface ContinueToWatch {
   image: string;
   video: string;
   title: string;
-  id: string;
+  _id: string;
 }
 
 

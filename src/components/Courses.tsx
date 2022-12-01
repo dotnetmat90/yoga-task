@@ -124,6 +124,7 @@ export function Courses() {
             })
             .catch((error) => {
                 console.log(error);
+                
             });
 
 
@@ -194,7 +195,7 @@ export function Courses() {
                 <SimpleGrid cols={3}>
 
                     {searchedCourses.map(function (course: any) {
-                        return (<BadgeCard onLike={likeCourse} likes={course.likes} rating={getRating()} id={course._id} key={course._id} image={course.image} title={course.name} video={course.videoUrl} country={''} description={course.description} badges={[]}></BadgeCard>)
+                        return (<BadgeCard onLike={likeCourse} likes={course.likes} rating={course.rating} id={course._id} key={course._id} image={course.image} title={course.name} video={course.videoUrl} country={''} description={course.description} badges={[]}></BadgeCard>)
                     })}
                 </SimpleGrid>
             </Container>

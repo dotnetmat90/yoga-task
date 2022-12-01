@@ -100,6 +100,9 @@ const mockdata = [
 export function NavbarMinimal() {
     const [user, setUser] = React.useState({} as any);
     const [numberOfCourses, setNumberOfCourses] = React.useState(0);
+    const [numberOfLikes, setnumberOfLikes] = React.useState(0);
+    const [numberOfViews, setnumberOfViews] = React.useState(0);
+
     React.useEffect(() => {
         if (localStorage.getItem("accessToken")) {
             setUser(jwt_decode(localStorage.getItem("accessToken") as string));
@@ -109,20 +112,57 @@ export function NavbarMinimal() {
     }, []);
 
 
+
+
     const getCourses = () => {
         axios
             .get("http://localhost:4000/api/courses")
             .then((response) => {
                 let number = 0;
                 const userToken = jwt_decode(localStorage.getItem("accessToken") as string) as any;
+                let totalLikes = 0;
+                let totalViews = 0;
 
                 response.data.forEach((item: any) => {
                     if (item.createdBy) {
                         if (item.createdBy === userToken._id)
                             number++;
+                        if (item.likes)
+                            totalLikes += item.likes;
+                        if (item.views)
+                            totalViews += item.views
                     }
                 })
+                localStorage.setItem("totalViews", totalViews.toString());
+                localStorage.setItem("totalLikes", totalLikes.toString());
+
+                setnumberOfLikes(totalLikes)
+
                 setNumberOfCourses(number);
+
+
+
+                axios
+                    .get('http://localhost:4000/api/comments')
+                    .then((comments) => {
+
+                        let numberOfComments = 0;
+
+                        response.data.forEach(item => {
+                            const find = comments.data.find(c => c.courseId === item._id);
+                            if (find) {
+                                numberOfComments++;
+                            }
+                        })
+                        localStorage.setItem("numberOfComments", numberOfComments.toString())
+                        console.log(comments)
+
+
+                    })
+                    .catch((error) => {
+                        console.log(error);
+                    });
+
             })
             .catch((error) => {
                 console.log(error);
@@ -259,27 +299,27 @@ export function NavbarMinimal() {
     const stats = {
         data: [
             {
-                label: 'A %',
+                label: 'Total views',
                 color: 'red',
-                icon: 'down',
-                progress: 20,
-                stats: 'Time spend'
+                icon: 'up',
+                progress: parseInt(localStorage.getItem("totalViews")) / 10000,
+                stats: localStorage.getItem("totalViews")
 
             },
             {
-                label: 'l %',
+                label: 'Total likes',
                 color: 'blue',
                 icon: 'up',
-                progress: 10,
-                stats: 'Total Views '
+                progress: parseInt(localStorage.getItem("totalLikes")) / 10000,
+                stats: localStorage.getItem("totalLikes")
 
             },
             {
-                label: 'Incrase %',
-                color: 'blue',
-                icon: 'down',
-                progress: 50,
-                stats: 'Rejection'
+                label: 'Total number of comments',
+                color: 'black',
+                icon: 'up',
+                progress: parseInt(localStorage.getItem("numberOfComments")) / 10000,
+                stats: localStorage.getItem("numberOfComments")
 
             },
 
@@ -307,8 +347,8 @@ export function NavbarMinimal() {
             >
 
                 <div  >
-                    <Center mt={0} mr={800} style={{  width: '100%', height: 500 }}>
-                        <Box> 
+                    <Center mt={0} mr={800} style={{ width: '100%', height: 500 }}>
+                        <Box>
                             <h2>Course statistics</h2>
 
 

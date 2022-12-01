@@ -11,7 +11,8 @@ const courseModel = mongoose.Schema(
     likes: { type: Number },
     watchedByNumber: { type: Number },
     views : {type: Number},
-    rating: {type:Number}
+    rating: {type:Number},
+    totalVotes: {type:Number}
   },
   { timestamps: true }
 );
